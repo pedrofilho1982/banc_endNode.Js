@@ -1,18 +1,22 @@
 const users = [];
-
+const {v4: uuidv4 } = require('uuid');
 class CreateUserController {
     handle(req, rep) {
         const { name, username, email } = req.body;
 
-    const user = {name, username, email};
+        const usernameAlreadyTaken = users.find(user => user.name === name && user.username === username);
 
-    users.push(user);
+        if (usernameAlreadyTaken) {
+            return rep.json ({ error: 'User already taken' }).send(400);
+        }
 
-    return rep.json({user}).send(201);
+        const user = { id: uuidv4(), name, username, email };
+
+        users.push(user);
+               
+        return rep.json({user}).send(201);
     }
-    list(request, response) {
-        response.json({users: users});
-    }
+    
 }
 
 module.exports = {CreateUserController};
